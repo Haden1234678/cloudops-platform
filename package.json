@@ -1,0 +1,17 @@
+{
+  "name": "cloudops-platform",
+  "version": "0.1.0",
+  "description": "A small service status platform - DevOps learning project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Rukiriza Herman",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}
