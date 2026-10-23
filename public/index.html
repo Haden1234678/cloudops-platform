@@ -10,28 +10,53 @@
     li { display: flex; justify-content: space-between; padding: 12px 16px; margin: 8px 0; background: #1b2530; border-radius: 8px; }
     .up { color: #3fb950; }
     .down { color: #f85149; }
+    .muted { color: #8b949e; font-size: 0.9rem; }
+    button { background: #1b2530; color: #e6edf3; border: 1px solid #30363d; border-radius: 6px; padding: 8px 14px; cursor: pointer; }
   </style>
 </head>
 <body>
   <h1>CloudOps Platform — Service Status</h1>
+  <p id="summary" class="muted">Loading…</p>
   <ul id="services"></ul>
+  <button id="refresh">Refresh</button>
   <script>
-    fetch('/api/services')
-      .then((response) => response.json())
-      .then((services) => {
-        const list = document.getElementById('services');
-        services.forEach((service) => {
-          const item = document.createElement('li');
-          const name = document.createElement('span');
-          name.textContent = service.name;
-          const status = document.createElement('span');
-          status.textContent = service.status;
-          status.className = service.status === 'up' ? 'up' : 'down';
-          item.appendChild(name);
-          item.appendChild(status);
-          list.appendChild(item);
-        });
-      });
+    const list = document.getElementById('services');
+    const summary = document.getElementById('summary');
+
+    function render(services) {
+      list.innerHTML = '';
+      for (const service of services) {
+        const item = document.createElement('li');
+        const name = document.createElement('span');
+        name.textContent = service.name;
+        const status = document.createElement('span');
+        status.textContent = service.status + ' (' + service.latencyMs + ' ms)';
+        status.className = service.status === 'up' ? 'up' : 'down';
+        if (service.error) status.title = service.error;
+        item.append(name, status);
+        list.appendChild(item);
+      }
+    }
+
+    async function load() {
+      summary.textContent = 'Checking…';
+      summary.className = 'muted';
+      try {
+        const response = await fetch('/api/services');
+        if (!response.ok) throw new Error('API returned HTTP ' + response.status);
+        const data = await response.json();
+        render(data.services);
+        summary.textContent = 'Last checked: ' + new Date(data.checkedAt).toLocaleTimeString();
+        summary.className = 'muted';
+      } catch (error) {
+        list.innerHTML = '';
+        summary.textContent = 'Could not load status: ' + error.message;
+        summary.className = 'down';
+      }
+    }
+
+    document.getElementById('refresh').addEventListener('click', load);
+    load();
   </script>
 </body>
 </html>

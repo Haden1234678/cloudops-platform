@@ -6,10 +6,10 @@ A small service status platform, built step by step as a DevOps learning project
 
 A web page that shows the status of the platform's services, backed by a JSON API.
 
-## Current version (v0.1)
+## Current version (v0.2)
 
-- `GET /health` - health check endpoint
-- `GET /api/services` - list of services and their status (in-memory data)
+- `GET /health` - liveness check for the API process
+- `GET /api/services` - runs real health checks and returns status, latency, and error details
 - `/` - web page that displays the service list
 
 ## Run it locally
