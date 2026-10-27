@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudops-platform
+  labels:
+    app: cloudops-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloudops-platform
+  template:
+    metadata:
+      labels:
+        app: cloudops-platform
+    spec:
+      containers:
+        - name: cloudops-platform
+          image: hermherto/cloudops-platform:latest
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
